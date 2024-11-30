@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            text-align: center; 
+            background-image: url('backg.jpg'); 
+            background-size: cover; 
+            background-position: center;
+            background-repeat: no-repeat;
+            color: white; 
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #game-container {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .hidden { display: none; }
+        .winner { font-weight: bold; }
+        .dice { width: 100px; height: 100px; margin: 10px; border-radius: 15px; }
+        #dice-results { display: flex; justify-content: center; align-items: center; }
+        #scoreboard { margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Гра: Користувач проти комп'ютера</h1>
+        <div id="prompt">
+            <label for="name">Введіть ваше ім'я:</label>
+            <input type="text" id="name">
+            <button id="startButton">Почати гру</button>
+        </div>
+        <div id="game" class="hidden">
+            <p>Вітаємо, <span id="player-name"></span>!</p>
+            <div id="scoreboard">
+                <p><span id="player-score">0</span> - <span id="computer-score">0</span></p>
+            </div>
+            <div id="dice-results">
+                <img id="player-dice" class="dice" src="dice-six-faces-six.png" alt="Кубик користувача">
+                <img id="computer-dice" class="dice" src="dice-six-faces-six.png" alt="Кубик комп'ютера">
+            </div>
+            <button id="playButton">Грати раунд</button>
+            <p id="result"></p>
+        </div>
+    </div>
+
+    <script>
+        let playerName;
+        let playerScore = 0;
+        let computerScore = 0;
+
+        const diceImages = [
+            "dice-six-faces-one.png",
+            "dice-six-faces-two.png",
+            "dice-six-faces-three.png",
+            "dice-six-faces-four.png",
+            "dice-six-faces-five.png",
+            "dice-six-faces-six.png"
+        ];
+        const rollingGif = "dice.gif";  // Не забудьте додати файл гіфки з анімацією
+
+        document.getElementById('startButton').addEventListener('click', startGame);
+        document.getElementById('playButton').addEventListener('click', playRound);
+
+        function startGame() {
+            playerName = document.getElementById('name').value;
+            if (playerName.trim() === "") {
+                alert("Будь ласка, введіть ваше ім'я.");
+                return;
+            }
+            document.getElementById('prompt').classList.add('hidden');
+            document.getElementById('game').classList.remove('hidden');
+            document.getElementById('player-name').textContent = playerName;
+        }
+
+        function playRound() {
+            document.getElementById('player-dice').src = rollingGif;
+            document.getElementById('computer-dice').src = rollingGif;
+
+            setTimeout(() => {
+                const playerNumber = rollDice();
+                const computerNumber = rollDice();
+
+                document.getElementById('player-dice').src = diceImages[playerNumber - 1];
+                document.getElementById('computer-dice').src = diceImages[computerNumber - 1];
+
+                if (playerNumber > computerNumber) {
+                    playerScore++;
+                } else if (playerNumber < computerNumber) {
+                    computerScore++;
+                }
+
+                document.getElementById('player-score').textContent = playerScore;
+                document.getElementById('computer-score').textContent = computerScore;
+
+                if (playerScore === 3 || computerScore === 3) {
+                    const winner = playerScore === 3 ? playerName : "Комп'ютер";
+                    document.getElementById('result').innerHTML = `<span class="winner">${winner} виграв гру!</span>`;
+                    document.getElementById('playButton').disabled = true;
+                }
+            }, 1000); // Затримка 1 секунда для показу гіфки
+        }
+
+        function rollDice() {
+            return Math.floor(Math.random() * 6) + 1;
+        }
+    </script>
+</body>
+</html>
